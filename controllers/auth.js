@@ -304,4 +304,121 @@ const getUser = (req, res, next) => {
         });
 };
 
-export { signup, login, isAuth, addUserToCreate, checkEmailToCreateUser, forgotPassword, updatePassword, getAllUsers, getUser };
+const getUserById = (req, res, next) => {
+    // checks if email exists
+    User.findOne({
+        where: {
+            id: req.query.userID,
+        }
+    }).then(usr => {
+            if (!usr) {
+                console.log('user not found')
+                return res.status(404).json({ message: "404: Id not found" });
+            } else {
+                User.findOne({where:{id: req.query.userID}}).then(user=>{
+                    res.status(200).json({user:user})
+                }).catch(err=>{console.log(err);res.status(500).json({message:"500: Couldnt collect user."})})
+            };
+        })
+        .catch(err => {
+            console.log('error', err);
+        });
+};
+
+//Deactivate user
+const deactivateUser = (req, res, next) => {
+    // checks if email exists and if user is admin
+    User.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(usr => {
+        if(usr.isAdmin){
+            User.update(
+                {
+                isDeactivated: true
+                },
+                {
+                    where: { id: req.body.userToDeactivateID }
+                }).then(() => {
+                    res.status(200).json({ message: "200: User deactivated." })
+                }).catch(err => {
+                    console.log(err)
+                    res.status(500).json({ message: "500: Couldnt deactivate user." })
+                })
+        }else{
+            res.status(401).json({ message: "401: You are not allowed to do that." })
+        }
+    }).catch(err => {
+        console.log('error', err);
+        res.status(500).json({ message: "500: Couldnt find user." })
+    })
+}
+
+//activate user
+const activateUser = (req, res, next) => {
+    // checks if email exists and if user is admin
+    User.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(usr => {
+        if(usr.isAdmin){
+            User.update(
+                {
+                    isDeactivated: false
+                },
+                {
+                    where: { id: req.body.userToActivateID }
+                }).then(() => {
+                    res.status(200).json({ message: "200: User activated." })
+                }).catch(err => {
+                    console.log(err)
+                    res.status(500).json({ message: "500: Couldnt activate user." })
+                }
+            )
+        }else{
+            res.status(401).json({ message: "401: You are not allowed to do that." })
+        }
+    }).catch(err => {
+        console.log('error', err);
+        res.status(500).json({ message: "500: Couldnt find user." })
+    })
+}
+
+//update user phone number
+const updateUserPhoneNumber = (req, res, next) => {
+    //check if user exists
+    User.findOne({
+        where: {
+            email: req.body.email,
+        }
+    })
+        .then(usr => {
+            if (!usr) {
+                console.log('user not found')
+                return res.status(404).json({ message: "404: Email not found" });
+            }
+            else {
+                User.update(
+                    {
+                        phone: req.body.newPhoneNumber
+                    },
+                    {
+                        where: { id: usr.id }
+                    }).then(() => {
+                        res.status(200).json({ message: "200: Phone number updated." })
+                    }
+                ).catch(err => {
+                    console.log(err)
+                    res.status(500).json({ message: "500: Couldnt update phone number." })
+                })
+            }
+        })
+        .catch(err => {
+            console.log('error', err);
+            res.status(500).json({ message: "500: Couldnt find user." })
+        })
+}
+
+export { signup, login, isAuth, addUserToCreate, checkEmailToCreateUser, forgotPassword, updatePassword, getAllUsers, getUser, getUserById, deactivateUser, activateUser, updateUserPhoneNumber };

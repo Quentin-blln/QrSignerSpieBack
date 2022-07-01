@@ -29,16 +29,7 @@ const Mission = sequelize.define('missions', {
    },
    isDone: {
     type: Sequelize.BOOLEAN,
-    },
-    doneSupervisor: {
-        type: Sequelize.INTEGER,
-        },
-    doneContributor: {
-        type: Sequelize.INTEGER,
-        },
-    doneComment: {
-        type: Sequelize.STRING,
-        },
+    }
 });
 
 export default Mission;

@@ -16,8 +16,5 @@ next();
 app.use(router);
 sequelize.sync(); 
 
-// bcrypt.hash('test', 12, (err, passwordHash) => {
-// 	console.log('passHash: ',passwordHash)
-// })
 
 app.listen(3000);
